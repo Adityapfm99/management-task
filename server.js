@@ -10,7 +10,8 @@ app.use(bodyParser.json());
 app.use(morgan('combined'));
 
 // MongoDB Connection
-mongoose.connect('mongodb://localhost:27017/task_management_db', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect('mongodb://127.0.0.1:27017/task_management_db');
+
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
