@@ -39,7 +39,7 @@ $ yarn test
 ![Alt text](img/unit-test.png)
 
 ## API Documentation Swagger
-![Alt text](img/api-docs.png)
+![Alt text](img/api-docs-swagger.png)
 ```bash
 $ {}url/docs
 ```
