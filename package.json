@@ -3,16 +3,26 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "node ./server.js"
+    "start": "node ./server.js",
+    "test": "jest --detectOpenHandles"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testTimeout": 10000
   },
   "keywords": [],
   "author": "aditya",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.20.2",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "express-winston": "^4.2.0",
+    "install": "^0.13.0",
+    "mongodb-memory-server": "^8.15.1",
     "mongoose": "^7.5.2",
     "morgan": "^1.10.0",
+    "npm": "^10.1.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0"
   },

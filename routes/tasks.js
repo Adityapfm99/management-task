@@ -1,12 +1,14 @@
 const express = require("express");
 const router = express.Router();
+const { ObjectId } = require("mongodb");
 const Task = require("../models/task");
+const mongoose = require("mongoose");
 
 // GET /tasks
 // Example route with Swagger annotations
 /**
  * @swagger
- * /Get:
+ * /tasks:
  *   get:
  *     summary: Get Tasks
  *     tags: [Tasks]
@@ -23,15 +25,23 @@ const Task = require("../models/task");
  *                   type: string
  */
 
-router.get("/", async (req, res) => {
+router.get("/", async (req, res, next) => {
   try {
-    const tasks = await Task.find();
-    res.json(tasks);
+    let tasks = await Task.find();
+    if (!tasks) {
+      return res
+        .status(404)
+        .json({ status: "error", message: "Task not found" });
+    }
+    res.status(200).json({
+      status: "ok",
+      message: "Retrive Data succesfully",
+      tasks,
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    next(err);
   }
 });
-
 /**
  * @swagger
  * /Post:
@@ -53,7 +63,7 @@ router.get("/", async (req, res) => {
  *               $ref: '#/components/schemas/Task'
  */
 
-router.post("/", async (req, res) => {
+router.post("/", async (req, res, next) => {
   const task = new Task({
     title: req.body.title,
     description: req.body.description,
@@ -62,9 +72,13 @@ router.post("/", async (req, res) => {
 
   try {
     const newTask = await task.save();
-    res.status(201).json(newTask);
+    res.status(201).json({
+      status: "ok",
+      message: "Task created succesfully",
+      id: newTask.id,
+    });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    next(err);
   }
 });
 
@@ -96,13 +110,13 @@ router.get("/:id", getTask, (req, res) => {
   res.json(res.task);
 });
 
-// PATCH /tasks/:id
 /**
  * @swagger
  * /tasks/{id}:
  *   patch:
  *     summary: Update a task by ID.
- *     tags: [Tasks]
+ *     tags:
+ *       - Tasks
  *     parameters:
  *       - in: path
  *         name: id
@@ -111,41 +125,60 @@ router.get("/:id", getTask, (req, res) => {
  *         schema:
  *           type: string
  *     requestBody:
+ *       description: Fields to update for the task
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Task'
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               completed:
+ *                 type: boolean
+ *             example:
+ *               title: Updated Title
+ *               description: Updated description
+ *               completed: true
  *     responses:
  *       200:
  *         description: The updated task.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Task'
+ *               $ref: '#/components/schemas/Task'  # Assuming you have a Task schema defined
  *       404:
  *         description: Task not found.
  */
 
-router.patch("/:id", getTask, async (req, res) => {
-  if (req.body.title != null) {
-    res.task.title = req.body.title;
-  }
-  if (req.body.description != null) {
-    res.task.description = req.body.description;
-  }
-  if (req.body.completed != null) {
-    res.task.completed = req.body.completed;
+router.patch("/:id", async (req, res) => {
+  const taskId = req.params.id;
+
+  // Validate if the provided ID is a valid MongoDB ID
+  if (!mongoose.Types.ObjectId.isValid(taskId)) {
+    return res.status(400).json({ message: "Invalid task ID" });
   }
 
   try {
-    const updatedTask = await res.task.save();
+    const updatedTask = await Task.findByIdAndUpdate(
+      taskId,
+      { $set: req.body }, // Update the task with the request body
+      { new: true } // Return the updated task
+    );
+
+    if (!updatedTask) {
+      return res
+        .status(404)
+        .json({ status: "error", message: "Task not found" });
+    }
+
     res.json(updatedTask);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
+  } catch (error) {
+    res.status(500).json({ status: "error", message: error.message });
   }
 });
-
 // DELETE /tasks/:id
 /**
  * @swagger
@@ -167,21 +200,43 @@ router.patch("/:id", getTask, async (req, res) => {
  *         description: Task not found.
  */
 
-router.delete("/:id", getTask, async (req, res) => {
+router.delete("/:id", async (req, res) => {
+  const taskId = req.params.id;
+
   try {
-    await res.task.remove();
-    res.json({ message: "Task deleted" });
+    // Validate if the provided ID is a valid MongoDB ID
+    if (!mongoose.Types.ObjectId.isValid(taskId)) {
+      return res.status(400).json({ message: "Invalid task ID" });
+    }
+
+    // Use findByIdAndRemove to delete the task
+    const deletedTask = await Task.findByIdAndRemove(taskId);
+
+    if (!deletedTask) {
+      return res
+        .status(404)
+        .json({ status: "error", message: "Task not found" });
+    }
+
+    res.json({ status: "ok", message: "Task has been deleted" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ status: "error", message: err.message });
   }
 });
 
 async function getTask(req, res, next) {
   let task;
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res
+        .status(404)
+        .json({ status: "error", message: "Invalid task ID" });
+    }
     task = await Task.findById(req.params.id);
-    if (task == null) {
-      return res.status(404).json({ message: "Task not found" });
+    if (task == null || !task) {
+      return res
+        .status(400)
+        .json({ status: "error", message: "Task not found" });
     }
   } catch (err) {
     return res.status(500).json({ message: err.message });

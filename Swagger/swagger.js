@@ -9,7 +9,7 @@ const options = {
       description: 'API documentation for Task Management Application',
     },
   },
-  apis: ["./routes/*.js"], // Path to the API routes file
+  apis: ["./routes/*.js"],
 };
 
 const specs = swaggerJsdoc(options);
