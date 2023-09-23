@@ -27,7 +27,19 @@ or
 ```bash
 $ npm start
 ```
+
+## How to Start
+
+```bash
+1. Git Clone https://github.com/Adityapfm99/management-task.git
+2. Install Mongo DB in local / Register in cloud Mongo DB
+3. Rename file env_sample to .env
+4. Replace value MONGODB_URI to your connection string
+
+```
 ## Unit testing
+
+To run the test suite, first install the dependencies, then run :
 
 ```bash
 $ npm test
@@ -87,11 +99,54 @@ Response:
     "id": "650dd655b0f8c919f51ea7f9"
 }
 ```
-## Support
+# Endpoint GET BY ID
+```
+Request: 
+Base_url = /api/v1
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+url : [Get] {Base_url}/tasks/650da8b0dadb0d0afab78c1e
 
-## License
+Response:
+{
+    "_id": "650da8b0dadb0d0afab78c1e",
+    "title": "coba",
+    "description": "this one is technical test123",
+    "completed": true,
+    "__v": 0
+}
+```
 
-Nest is [MIT licensed](LICENSE).
+# Endpoint UPDATE BY ID
+```
+Request: 
+Base_url = /api/v1
 
+url : [PATCH] {Base_url}/tasks/650da8b0dadb0d0afab78c1e
+
+payload : {
+    "title": "update",
+    "description": "this one is technical test",
+    "completed": true
+}
+
+Response:
+{
+    "_id": "650da8b0dadb0d0afab78c1e",
+    "title": "update",
+    "description": "this one is technical test",
+    "completed": true,
+    "__v": 0
+}
+```
+# Endpoint DELETE BY ID
+```
+Request: 
+Base_url = /api/v1
+
+url : [DELETE] {Base_url}/tasks/650da8b0dadb0d0afab78c1e
+
+Response:
+{
+    "status": "ok",
+    "message": "Task has been deleted"
+}
