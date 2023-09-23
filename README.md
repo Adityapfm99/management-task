@@ -53,7 +53,7 @@ $ yarn test
 ## API Documentation Swagger
 ![Alt text](img/api-docs-swagger.png)
 ```bash
-$ {}url/docs
+$ http://localhost:3000/docs
 ```
 
 # Endpoint  GET
