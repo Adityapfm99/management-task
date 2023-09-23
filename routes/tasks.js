@@ -8,7 +8,7 @@ const mongoose = require("mongoose");
 // Example route with Swagger annotations
 /**
  * @swagger
- * /tasks:
+ * /api/v1/tasks:
  *   get:
  *     summary: Get Tasks
  *     tags: [Tasks]
@@ -42,13 +42,45 @@ router.get("/", async (req, res, next) => {
     next(err);
   }
 });
+
 /**
  * @swagger
- * /Post:
+ * tags:
+ *   name: Tasks
+ *   description: Task management APIs
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Task:
+ *       type: object
+ *       properties:
+ *         title:
+ *           type: string
+ *           description: Title of the task.
+ *         description:
+ *           type: string
+ *           description: Description of the task.
+ *         completed:
+ *           type: boolean
+ *           description: Indicates whether the task is completed or not.
+ *       example:
+ *         title: New Task
+ *         description: This is a new task.
+ *         completed: false
+ */
+
+/**
+ * @swagger
+ * /api/v1/tasks:
  *   post:
  *     summary: Create a new task.
- *     tags: [Tasks]
+ *     tags:
+ *       - Tasks
  *     requestBody:
+ *       description: Request body for creating a new task.
  *       required: true
  *       content:
  *         application/json:
@@ -60,8 +92,13 @@ router.get("/", async (req, res, next) => {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Task'
+ *               $ref: '#/components/schemas/Task'  # Reference the actual Task model schema
+ *       400:
+ *         description: Bad request.
+ *       500:
+ *         description: Internal server error.
  */
+
 
 router.post("/", async (req, res, next) => {
   const task = new Task({
@@ -85,7 +122,7 @@ router.post("/", async (req, res, next) => {
 // GET /tasks/:id
 /**
  * @swagger
- * /tasks/{id}:
+ *  /api/v1/tasks/{id}:
  *   get:
  *     summary: Get a task by ID.
  *     tags: [Tasks]
@@ -112,7 +149,7 @@ router.get("/:id", getTask, (req, res) => {
 
 /**
  * @swagger
- * /tasks/{id}:
+ * /api/v1/tasks/{id}:
  *   patch:
  *     summary: Update a task by ID.
  *     tags:
@@ -182,7 +219,7 @@ router.patch("/:id", async (req, res) => {
 // DELETE /tasks/:id
 /**
  * @swagger
- * /tasks/{id}:
+ * /api/v1/tasks:/{id}:
  *   delete:
  *     summary: Delete a task by ID.
  *     tags: [Tasks]
