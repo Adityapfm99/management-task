@@ -5,7 +5,7 @@ const swaggerOptions = {
   swaggerDefinition: {
     openapi: '3.0.0', 
     info: {
-      title: 'Task API',
+      title: 'Management Task',
       description: 'API for managing tasks',
       version: '1.0.0',
     },
